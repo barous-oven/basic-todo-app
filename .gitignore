@@ -42,3 +42,4 @@ bun.lockb
 # temp files
 tmp/
 temp/
+*/generated/prisma
