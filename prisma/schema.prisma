@@ -14,12 +14,11 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  name         String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  groupMembers GroupMember[]
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum TaskStatus {
@@ -29,40 +28,10 @@ enum TaskStatus {
 }
 
 model Task {
-  id          String      @id @default(uuid())
+  id          String     @id @default(uuid())
   title       String
   description String?
-  status      TaskStatus  @default(PENDING)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  taskGroups  TaskGroup[] // annotation
-}
-
-model TaskGroup {
-  id        String   @id @default(uuid())
-  task      Task     @relation(fields: [taskId], references: [id])
-  taskId    String
-  groupId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  group     Group    @relation(fields: [groupId], references: [id])
-}
-
-model Group {
-  id           String        @id @default(uuid())
-  name         String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  taskGroups   TaskGroup[]
-  groupMembers GroupMember[]
-}
-
-model GroupMember {
-  id        String   @id @default(uuid())
-  group     Group    @relation(fields: [groupId], references: [id])
-  groupId   String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status      TaskStatus @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
