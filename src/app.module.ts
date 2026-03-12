@@ -6,6 +6,7 @@ import { EnvConfigService } from './config/envConfig.service';
 import { PrismaModule } from './libs/database/prisma.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { EnvConfigModule } from './config/envConfig.module';
 
 @Module({
   imports: [
@@ -15,9 +16,9 @@ import { AuthModule } from './modules/auth/auth.module';
     PrismaModule,
     UsersModule,
     AuthModule,
+    EnvConfigModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EnvConfigService],
-  exports: [EnvConfigService],
+  providers: [AppService],
 })
 export class AppModule {}

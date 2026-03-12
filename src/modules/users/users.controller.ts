@@ -1,6 +1,13 @@
-import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserResponseDto } from './dto/user.dto';
+import { JwtAuthGuard } from 'src/guards/auth.guard';
 
 @Controller({
   version: '1',
