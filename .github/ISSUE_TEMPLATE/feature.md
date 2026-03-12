@@ -1,6 +1,6 @@
 ---
 name: Feature Implementation
-about: Template for writing time log
+about: Feature implementation template
 title: ''
 labels: ''
 assignees: ''

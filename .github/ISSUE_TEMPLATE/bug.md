@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Template for writing time log
+about: Bug report template
 title: ''
 labels: ''
 assignees: ''
