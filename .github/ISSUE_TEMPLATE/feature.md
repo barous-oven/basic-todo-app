@@ -1,5 +1,5 @@
 ---
-name: Custom issue template
+name: Feature Implementation
 about: Template for writing time log
 title: ''
 labels: ''

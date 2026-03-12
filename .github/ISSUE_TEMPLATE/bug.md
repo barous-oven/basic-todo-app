@@ -1,5 +1,5 @@
 ---
-name: Custom issue template
+name: Bug Report
 about: Template for writing time log
 title: ''
 labels: ''
