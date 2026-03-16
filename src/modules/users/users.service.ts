@@ -7,18 +7,15 @@ import { CreateUserRequestDto, UserResponseDto } from './dto/user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    CreateUserRequestDto: CreateUserRequestDto,
-  ): Promise<UserResponseDto> {
-    const hashedPassword = await PasswordUtils.hashPassword(
-      CreateUserRequestDto.password,
-    );
+  async create(data: CreateUserRequestDto): Promise<UserResponseDto> {
+    const { password, email, name } = data;
+    const hashedPassword = await PasswordUtils.hashPassword(password);
 
     const user = await this.prisma.user.create({
       data: {
-        email: CreateUserRequestDto.email,
+        email,
         password: hashedPassword,
-        name: CreateUserRequestDto.name,
+        name,
       },
     });
 
