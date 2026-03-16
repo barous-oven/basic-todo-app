@@ -1,8 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterRequestDto } from './dto/register.dto';
-import { BaseResponse } from 'src/utils/response/response.util';
-import { HttpStatus } from '@nestjs/common';
+import { RegisterRequestDto, RegisterResponseDto } from './dto/register.dto';
 
 @Controller({
   version: '1',
@@ -12,9 +10,11 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/register')
-  async register(@Body() data: RegisterRequestDto) {
+  async register(
+    @Body() data: RegisterRequestDto,
+  ): Promise<RegisterResponseDto> {
     const response = await this.authService.register(data);
 
-    return BaseResponse.success<string>(HttpStatus.CREATED, response);
+    return response;
   }
 }
