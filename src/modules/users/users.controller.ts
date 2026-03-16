@@ -1,16 +1,26 @@
 import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { BaseResponse } from 'src/libs/response/base.response';
-import { GetUserDto } from './dto/get-user.dto';
+import { BaseResponse } from 'src/utils/response/response.util';
+import { GetUserResponseDto } from './dto/get-user.dto';
+import { HttpStatus } from '@nestjs/common';
 
-@Controller('users')
+@Controller({
+  version: '1',
+  path: 'users',
+})
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    const users = await this.usersService.findAll();
+
+    return BaseResponse.success<GetUserResponseDto[]>(
+      HttpStatus.OK,
+      'Users retrieved successfully',
+      users,
+    );
   }
 
   @Get(':id')
@@ -21,7 +31,11 @@ export class UsersController {
       return `User with id ${id} not found`;
     }
 
-    return BaseResponse.success<GetUserDto>(user);
+    return BaseResponse.success<GetUserResponseDto>(
+      HttpStatus.OK,
+      'User found',
+      user,
+    );
   }
 
   @Patch(':id')
