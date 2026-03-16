@@ -5,4 +5,4 @@ import {
 
 export class RegisterRequestDto extends CreateUserRequestDto {}
 
-export type RegisterResponseDto = UserResponseDto;
+export class RegisterResponseDto extends UserResponseDto {}

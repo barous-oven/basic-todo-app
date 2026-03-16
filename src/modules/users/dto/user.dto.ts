@@ -1,20 +1,20 @@
-import { UserModel } from 'src/generated/prisma/models';
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, IsUUID, MinLength } from 'class-validator';
+import { OmitType } from '@nestjs/mapped-types';
 
-export type UserResponseDto = Omit<
-  UserModel,
-  'password' | 'createdAt' | 'updatedAt'
->;
+export class UserResponseDto {
+  @IsUUID()
+  id: string;
 
-export class CreateUserRequestDto {
   @IsString()
   @IsEmail()
   email: string;
 
   @IsString()
+  name: string;
+}
+
+export class CreateUserRequestDto extends OmitType(UserResponseDto, ['id']) {
+  @IsString()
   @MinLength(8)
   password: string;
-
-  @IsString()
-  name: string;
 }
