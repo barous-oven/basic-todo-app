@@ -1,0 +1,41 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/libs/database/prisma.service';
+import { PasswordUtils } from 'src/utils/password/password.util';
+import { CreateUserRequestDto, UserResponseDto } from './dto/user.dto';
+
+@Injectable()
+export class UsersService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(data: CreateUserRequestDto): Promise<UserResponseDto> {
+    const { password, email, name } = data;
+    const hashedPassword = await PasswordUtils.hashPassword(password);
+
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+      },
+    });
+
+    return user;
+  }
+
+  async findOne(id: string): Promise<UserResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      omit: {
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    return user;
+  }
+}

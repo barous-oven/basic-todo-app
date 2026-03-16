@@ -18,9 +18,15 @@ A simple and intuitive todo application to help you manage your daily tasks effi
    yarn install
    ```
 
-4. Prisma setup
+4. Run docker compose to start the database:
 
-- make sure you have a `.env` with your `DATABASE_URL`.
+   ```
+   docker compose up -d
+   ```
+
+5. Prisma setup
+
+- make sure you have a `.env` with your `DATABASE_URL` (e.g., `DATABASE_URL=postgresql://postgres:change_me@localhost:5432/mydatabase`).
 - run migrations and generate the client:
   ```
   npx prisma migrate dev --name init
