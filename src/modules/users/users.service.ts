@@ -14,18 +14,15 @@ export class UsersService {
       CreateUserRequestDto.password,
     );
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         email: CreateUserRequestDto.email,
         password: hashedPassword,
         name: CreateUserRequestDto.name,
       },
-      omit: {
-        password: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
+
+    return user;
   }
 
   async findOne(id: string): Promise<UserResponseDto> {

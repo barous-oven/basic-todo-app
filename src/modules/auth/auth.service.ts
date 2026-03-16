@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/libs/database/prisma.service';
-import { RegisterRequestDto, RegisterResponseDto } from './dto/register.dto';
+import { RegisterRequestDto } from './dto/register.dto';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  async register(data: RegisterRequestDto): Promise<RegisterResponseDto> {
+  async register(data: RegisterRequestDto): Promise<void> {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: data.email },
     });
@@ -21,7 +21,6 @@ export class AuthService {
       );
     }
 
-    const user = await this.usersService.create(data);
-    return user;
+    await this.usersService.create(data);
   }
 }
