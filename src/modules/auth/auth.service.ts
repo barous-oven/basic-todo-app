@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/libs/database/prisma.service';
 import { RegisterRequestDto } from './dto/register.dto';
 import { UsersService } from '../users/users.service';
@@ -11,12 +11,17 @@ export class AuthService {
   ) {}
 
   async register(data: RegisterRequestDto): Promise<string> {
-    try {
-      const user = await this.usersService.create(data);
-      return `User with email ${user.id} registered successfully`;
-    } catch (error) {
-      console.error('Error creating user:', error);
-      throw new Error('Failed to create user');
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException(
+        `User with email ${data.email} already exists`,
+      );
     }
+
+    const user = await this.usersService.create(data);
+    return `User with id ${user.id} registered successfully`;
   }
 }
