@@ -2,12 +2,19 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/libs/database/prisma.service';
 import { RegisterRequestDto } from './dto/register.dto';
 import { UsersService } from '../users/users.service';
+import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
+import { PasswordUtils } from 'src/utils/password/password.util';
+import { TokenService } from '../token/token.service';
+import { EnvConfigService } from '../../config/envConfig.service';
+import { TokenType } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly usersService: UsersService,
+    private readonly tokenService: TokenService,
+    private readonly envConfigService: EnvConfigService,
   ) {}
 
   async register(data: RegisterRequestDto): Promise<void> {
@@ -22,5 +29,49 @@ export class AuthService {
     }
 
     await this.usersService.create(data);
+  }
+
+  async login(data: LoginRequestDto): Promise<LoginResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (!user) {
+      throw new ConflictException(`Invalid email or password`);
+    }
+
+    const isValid = await PasswordUtils.verifyPassword(
+      data.password,
+      user.password,
+    );
+
+    if (!isValid) {
+      throw new ConflictException(`Invalid email or password`);
+    }
+
+    const payload = {
+      id: user.id,
+    };
+
+    const accessToken = this.tokenService.generateToken(
+      payload,
+      this.envConfigService.jwt.access,
+    );
+    const refreshToken = this.tokenService.generateToken(
+      payload,
+      this.envConfigService.jwt.refresh,
+      TokenType.REFRESH,
+    );
+
+    await this.tokenService.saveToken({
+      userId: user.id,
+      token: refreshToken,
+      type: TokenType.REFRESH,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }
