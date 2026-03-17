@@ -1,5 +1,5 @@
 import { PrismaService } from 'src/libs/database/prisma.service';
-import { CreateTokenRequestDto } from './dto/token.dto';
+import { CreateTokenRequestDto } from './dto/request.dto';
 import { Injectable } from '@nestjs/common';
 import { TokenType } from 'src/generated/prisma/enums';
 import { StringValue } from 'ms';
