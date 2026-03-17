@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { StringValue } from 'ms';
 
 @Injectable()
 export class EnvConfigService {
@@ -13,8 +14,8 @@ export class EnvConfigService {
   }
 
   get jwt(): {
-    access: { secret: string; expiresIn: string };
-    refresh: { secret: string; expiresIn: string };
+    access: { secret: string; expiresIn: StringValue };
+    refresh: { secret: string; expiresIn: StringValue };
   } {
     return {
       access: {
@@ -22,14 +23,20 @@ export class EnvConfigService {
           'JWT_SECRET_KEY',
           'your_jwt_secret_key',
         ),
-        expiresIn: this.configService.get<string>('ACCESS_EXPRITED_IN', '1h'),
+        expiresIn: this.configService.get<StringValue>(
+          'ACCESS_EXPIRES_IN',
+          '1h',
+        ),
       },
       refresh: {
         secret: this.configService.get<string>(
           'JWT_SECRET_KEY',
           'your_jwt_secret_key',
         ),
-        expiresIn: this.configService.get<string>('REFRESH_EXPRITED_IN', '7d'),
+        expiresIn: this.configService.get<StringValue>(
+          'REFRESH_EXPIRES_IN',
+          '7d',
+        ),
       },
     };
   }

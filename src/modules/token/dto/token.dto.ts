@@ -1,4 +1,5 @@
-import { IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsString, IsUUID } from 'class-validator';
+import { TokenType } from 'src/generated/prisma/enums';
 
 export class CreateTokenRequestDto {
   @IsUUID()
@@ -6,4 +7,7 @@ export class CreateTokenRequestDto {
 
   @IsString()
   token: string;
+
+  @IsEnum(TokenType)
+  type: TokenType;
 }

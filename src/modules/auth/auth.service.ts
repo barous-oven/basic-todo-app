@@ -5,8 +5,8 @@ import { UsersService } from '../users/users.service';
 import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
 import { PasswordUtils } from 'src/utils/password/password.util';
 import { TokenService } from '../token/token.service';
-import * as jwt from 'jsonwebtoken';
 import { EnvConfigService } from '../../config/envConfig.service';
+import { TokenType } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class AuthService {
@@ -53,38 +53,25 @@ export class AuthService {
       id: user.id,
     };
 
-    const accessToken = this.generateToken(
+    const accessToken = this.tokenService.generateToken(
       payload,
       this.envConfigService.jwt.access,
     );
-    const refreshToken = this.generateToken(
+    const refreshToken = this.tokenService.generateToken(
       payload,
       this.envConfigService.jwt.refresh,
-      true,
+      TokenType.REFRESH,
     );
 
-    this.tokenService.saveRefreshToken({
+    await this.tokenService.saveToken({
       userId: user.id,
       token: refreshToken,
+      type: TokenType.REFRESH,
     });
 
     return {
-      accessToken: accessToken,
-      refreshToken: refreshToken,
+      accessToken,
+      refreshToken,
     };
-  }
-
-  private generateToken(
-    payload: { id: string },
-    jwtConfig: { secret: string; expiresIn: string },
-    isRefresh: boolean = false,
-  ) {
-    return jwt.sign(
-      { userId: payload.id, type: isRefresh ? 'refresh' : 'access' },
-      jwtConfig.secret,
-      {
-        expiresIn: jwtConfig.expiresIn,
-      } as jwt.SignOptions,
-    );
   }
 }

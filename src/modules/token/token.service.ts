@@ -1,23 +1,27 @@
 import { PrismaService } from 'src/libs/database/prisma.service';
 import { CreateTokenRequestDto } from './dto/token.dto';
+import { Injectable } from '@nestjs/common';
+import { TokenType } from 'src/generated/prisma/enums';
+import { StringValue } from 'ms';
 import * as jwt from 'jsonwebtoken';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { EnvConfigService } from 'src/config/envConfig.service';
 
 @Injectable()
 export class TokenService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async saveRefreshToken(data: CreateTokenRequestDto): Promise<void> {
-    const { userId, token } = data;
+  async saveToken(data: CreateTokenRequestDto): Promise<void> {
+    await this.prisma.token.create({
+      data: data,
+    });
+  }
 
-    await this.prisma.refreshToken.upsert({
-      where: { userId },
-      update: { token: token },
-      create: {
-        userId,
-        token: token,
-      },
+  public generateToken(
+    payload: { id: string },
+    jwtConfig: { secret: string; expiresIn: StringValue },
+    type: TokenType = TokenType.ACCESS,
+  ) {
+    return jwt.sign({ userId: payload.id, type }, jwtConfig.secret, {
+      expiresIn: jwtConfig.expiresIn,
     });
   }
 }
