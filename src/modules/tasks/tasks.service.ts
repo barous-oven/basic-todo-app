@@ -3,6 +3,13 @@ import { PrismaService } from 'src/libs/database/prisma.service';
 import { TaskStatus } from 'src/generated/prisma/enums';
 import { TUserPayload } from '../auth/auth.type';
 import { CreateTaskRequestDto, CreateTaskResponseDto } from './dto/create.dto';
+import {
+  GetListTaskRequestDto,
+  GetListTaskResponseDto,
+} from './dto/get-list.dto';
+import { PaginationResponse } from 'src/utils/pagination/response';
+import { plainToInstance } from 'class-transformer';
+import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
 export class TasksService {
@@ -24,6 +31,60 @@ export class TasksService {
 
     return {
       id: task.id,
+    };
+  }
+
+  async getList(
+    query: GetListTaskRequestDto,
+  ): Promise<PaginationResponse<GetListTaskResponseDto>> {
+    const { limit, page, status, title, expiredAt } = query;
+
+    const take = limit;
+    const skip = (page - 1) * take;
+
+    const where: Prisma.TaskWhereInput = {};
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (title) {
+      where.title = {
+        contains: title,
+        mode: 'insensitive',
+      };
+    }
+
+    if (expiredAt) {
+      where.expiredAt = {
+        lte: expiredAt,
+      };
+    }
+
+    const [tasks, total] = await Promise.all([
+      this.prisma.task.findMany({
+        where,
+        skip,
+        take,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prisma.task.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / take);
+
+    const taskResult = plainToInstance(GetListTaskResponseDto, tasks, {
+      excludeExtraneousValues: true,
+    });
+
+    return {
+      data: taskResult,
+      meta: {
+        total,
+        totalPages,
+      },
     };
   }
 }
