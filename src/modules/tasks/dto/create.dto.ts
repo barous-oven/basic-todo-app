@@ -1,10 +1,8 @@
-import { OmitType } from '@nestjs/mapped-types';
+import { PickType } from '@nestjs/mapped-types';
 import { ResponseTaskDto } from './response.dto';
 
-export class CreateTaskDto extends OmitType(ResponseTaskDto, [
-  'id',
-  'createdAt',
-  'createdBy',
-  'updatedAt',
-  'status',
+export class CreateTaskDto extends PickType(ResponseTaskDto, [
+  'title',
+  'description',
+  'expiredAt',
 ]) {}

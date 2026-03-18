@@ -17,16 +17,14 @@ export class TasksService {
 
     const createdBy: string = user.userId;
 
-    const createdTask = await this.prisma.task.create({
+    return await this.prisma.task.create({
       data: {
         title,
-        description: description || '',
+        description,
         status: TaskStatus.PENDING,
         createdBy,
         expiredAt,
       },
     });
-
-    return ResponseTaskDto.toResponse(createdTask);
   }
 }

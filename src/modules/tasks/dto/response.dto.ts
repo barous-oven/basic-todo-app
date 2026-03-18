@@ -1,5 +1,6 @@
+import { Transform } from 'class-transformer';
 import {
-  IsDateString,
+  IsDate,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -7,7 +8,6 @@ import {
   IsUUID,
 } from 'class-validator';
 import { TaskStatus } from 'src/generated/prisma/enums';
-import { TaskModel } from 'src/generated/prisma/models';
 
 export class ResponseTaskDto {
   @IsUUID()
@@ -27,25 +27,15 @@ export class ResponseTaskDto {
   @IsUUID()
   createdBy: string;
 
-  @IsDateString()
-  expiredAt: string;
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  expiredAt: Date;
 
-  @IsDateString()
-  createdAt: string;
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  createdAt: Date;
 
-  @IsDateString()
-  updatedAt: string;
-
-  static toResponse(task: TaskModel): ResponseTaskDto {
-    return {
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      createdBy: task.createdBy,
-      expiredAt: task.expiredAt.toISOString(),
-      createdAt: task.createdAt.toISOString(),
-      updatedAt: task.updatedAt.toISOString(),
-    };
-  }
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  updatedAt: Date;
 }
