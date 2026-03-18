@@ -13,7 +13,7 @@ export class TasksService {
     data: CreateTaskDto,
     user: TUserPayload,
   ): Promise<ResponseTaskDto> {
-    const { title, description } = data;
+    const { title, description, expiredAt } = data;
 
     const createdBy: string = user.userId;
 
@@ -23,6 +23,7 @@ export class TasksService {
         description: description || '',
         status: TaskStatus.PENDING,
         createdBy,
+        expiredAt,
       },
     });
 

@@ -28,6 +28,9 @@ export class ResponseTaskDto {
   createdBy: string;
 
   @IsDateString()
+  expiredAt: string;
+
+  @IsDateString()
   createdAt: string;
 
   @IsDateString()
@@ -40,6 +43,7 @@ export class ResponseTaskDto {
       description: task.description,
       status: task.status,
       createdBy: task.createdBy,
+      expiredAt: task.expiredAt.toISOString(),
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };
