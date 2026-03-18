@@ -4,11 +4,12 @@ import { TaskStatus } from 'src/generated/prisma/enums';
 import { TUserPayload } from '../auth/auth.type';
 import { CreateTaskRequestDto, CreateTaskResponseDto } from './dto/create.dto';
 import {
-  GetListRequestTaskDto,
+  GetListTaskRequestDto,
   GetListTaskResponseDto,
 } from './dto/get-list.dto';
 import { PaginationResponse } from 'src/utils/pagination/response';
 import { plainToInstance } from 'class-transformer';
+import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
 export class TasksService {
@@ -34,14 +35,14 @@ export class TasksService {
   }
 
   async getList(
-    options: GetListRequestTaskDto,
-  ): Promise<PaginationResponse<GetListTaskResponseDto[]>> {
-    const { limit, page, status, title, expiredAt } = options;
+    query: GetListTaskRequestDto,
+  ): Promise<PaginationResponse<GetListTaskResponseDto>> {
+    const { limit, page, status, title, expiredAt } = query;
 
-    const take = limit || 10;
-    const skip = ((page || 1) - 1) * take;
+    const take = limit;
+    const skip = (page - 1) * take;
 
-    const where: any = {};
+    const where: Prisma.TaskWhereInput = {};
 
     if (status) {
       where.status = status;

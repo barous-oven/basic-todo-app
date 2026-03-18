@@ -4,7 +4,7 @@ import { TaskStatus } from 'src/generated/prisma/enums';
 import { PaginationRequest } from 'src/utils/pagination/request';
 import { DetailTaskDto } from './detail.dto';
 
-export class GetListRequestTaskDto extends PaginationRequest {
+export class GetListTaskRequestDto extends PaginationRequest {
   @IsOptional()
   @IsString()
   title?: string;

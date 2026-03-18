@@ -6,7 +6,7 @@ import { CurrentUser } from 'src/libs/decorator/current-user.decorator';
 import type { TUserPayload } from '../auth/auth.type';
 import { PaginationResponse } from '../../utils/pagination/response';
 import {
-  GetListRequestTaskDto,
+  GetListTaskRequestDto,
   GetListTaskResponseDto,
 } from './dto/get-list.dto';
 
@@ -28,8 +28,8 @@ export class TasksController {
 
   @Get()
   async getList(
-    @Query() options: GetListRequestTaskDto,
-  ): Promise<PaginationResponse<GetListTaskResponseDto[]>> {
-    return this.tasksService.getList(options);
+    @Query() query: GetListTaskRequestDto,
+  ): Promise<PaginationResponse<GetListTaskResponseDto>> {
+    return this.tasksService.getList(query);
   }
 }

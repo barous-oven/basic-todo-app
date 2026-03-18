@@ -14,5 +14,5 @@ export class PaginationResponse<T> {
   @Type(() => PaginationMeta)
   meta: PaginationMeta;
 
-  data: T;
+  data: T[];
 }
