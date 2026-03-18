@@ -16,7 +16,7 @@ export class TasksService {
 
     const createdBy: string = user.userId;
 
-    return await this.prisma.task.create({
+    const task = await this.prisma.task.create({
       data: {
         title,
         description,
@@ -25,5 +25,9 @@ export class TasksService {
         expiredAt,
       },
     });
+
+    return {
+      id: task.id,
+    };
   }
 }
