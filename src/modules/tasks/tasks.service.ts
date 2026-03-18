@@ -12,17 +12,13 @@ export class TasksService {
     data: CreateTaskRequestDto,
     user: TUserPayload,
   ): Promise<CreateTaskResponseDto> {
-    const { title, description, expiredAt } = data;
-
     const createdBy: string = user.userId;
 
     const task = await this.prisma.task.create({
       data: {
-        title,
-        description,
+        ...data,
         status: TaskStatus.PENDING,
         createdBy,
-        expiredAt,
       },
     });
 
