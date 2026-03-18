@@ -10,6 +10,7 @@ import {
 import { PaginationResponse } from 'src/utils/pagination/response';
 import { plainToInstance } from 'class-transformer';
 import { Prisma } from 'src/generated/prisma/client';
+import { UpdateTaskRequestDto, UpdateTaskResponseDto } from './dto/update.dto';
 
 @Injectable()
 export class TasksService {
@@ -29,9 +30,11 @@ export class TasksService {
       },
     });
 
-    return {
-      id: task.id,
-    };
+    const response = plainToInstance(CreateTaskResponseDto, task, {
+      excludeExtraneousValues: true,
+    });
+
+    return response;
   }
 
   async getList(
@@ -86,5 +89,21 @@ export class TasksService {
         totalPages,
       },
     };
+  }
+
+  async update(
+    id: string,
+    data: UpdateTaskRequestDto,
+  ): Promise<UpdateTaskResponseDto> {
+    const updatedData = await this.prisma.task.update({
+      where: { id: id },
+      data,
+    });
+
+    const response = plainToInstance(UpdateTaskResponseDto, updatedData, {
+      excludeExtraneousValues: true,
+    });
+
+    return response;
   }
 }

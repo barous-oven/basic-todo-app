@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskRequestDto, CreateTaskResponseDto } from './dto/create.dto';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -9,6 +18,7 @@ import {
   GetListTaskRequestDto,
   GetListTaskResponseDto,
 } from './dto/get-list.dto';
+import { UpdateTaskRequestDto, UpdateTaskResponseDto } from './dto/update.dto';
 
 @Controller({
   version: '1',
@@ -31,5 +41,13 @@ export class TasksController {
     @Query() query: GetListTaskRequestDto,
   ): Promise<PaginationResponse<GetListTaskResponseDto>> {
     return this.tasksService.getList(query);
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() data: UpdateTaskRequestDto,
+  ): Promise<UpdateTaskResponseDto> {
+    return this.tasksService.update(id, data);
   }
 }
