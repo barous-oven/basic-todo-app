@@ -19,6 +19,7 @@ import {
   GetListTaskResponseDto,
 } from './dto/get-list.dto';
 import { UpdateTaskRequestDto, UpdateTaskResponseDto } from './dto/update.dto';
+import { OwnerShipGuard } from 'src/guards/ownership.guard';
 
 @Controller({
   version: '1',
@@ -44,6 +45,7 @@ export class TasksController {
   }
 
   @Put(':id')
+  @UseGuards(OwnerShipGuard('task'))
   async update(
     @Param('id') id: string,
     @Body() data: UpdateTaskRequestDto,
