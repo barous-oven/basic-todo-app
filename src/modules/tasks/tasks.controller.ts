@@ -1,8 +1,7 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto } from './dto/create.dto';
+import { CreateTaskRequestDto, CreateTaskResponseDto } from './dto/create.dto';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { ResponseTaskDto } from './dto/response.dto';
 import { CurrentUser } from 'src/libs/decorator/current-user.decorator';
 import type { TUserPayload } from '../auth/auth.type';
 
@@ -16,9 +15,9 @@ export class TasksController {
 
   @Post()
   async create(
-    @Body() data: CreateTaskDto,
+    @Body() data: CreateTaskRequestDto,
     @CurrentUser() user: TUserPayload,
-  ): Promise<ResponseTaskDto> {
+  ): Promise<CreateTaskResponseDto> {
     return await this.tasksService.create(data, user);
   }
 }
