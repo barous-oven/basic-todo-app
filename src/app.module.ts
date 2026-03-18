@@ -7,6 +7,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { EnvConfigModule } from './config/envConfig.module';
 import { JwtStrategy } from './guards/strategies/jwt.strategy';
+import { TasksModule } from './modules/tasks/tasks.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { JwtStrategy } from './guards/strategies/jwt.strategy';
     UsersModule,
     AuthModule,
     EnvConfigModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
