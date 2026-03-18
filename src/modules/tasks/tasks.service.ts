@@ -99,10 +99,7 @@ export class TasksService {
   ): Promise<UpdateTaskResponseDto> {
     const updatedData = await this.prisma.task.update({
       where: { id, deletedAt: null },
-      data: {
-        ...data,
-        updatedAt: new Date(),
-      },
+      data,
     });
 
     const response = plainToInstance(UpdateTaskResponseDto, updatedData, {
