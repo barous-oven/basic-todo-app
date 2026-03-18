@@ -45,7 +45,9 @@ export class TasksService {
     const take = limit;
     const skip = (page - 1) * take;
 
-    const where: Prisma.TaskWhereInput = {};
+    const where: Prisma.TaskWhereInput = {
+      deletedAt: null,
+    };
 
     if (status) {
       where.status = status;
@@ -96,7 +98,7 @@ export class TasksService {
     data: UpdateTaskRequestDto,
   ): Promise<UpdateTaskResponseDto> {
     const updatedData = await this.prisma.task.update({
-      where: { id: id },
+      where: { id, deletedAt: null },
       data,
     });
 
@@ -105,5 +107,14 @@ export class TasksService {
     });
 
     return response;
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.task.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
   }
 }

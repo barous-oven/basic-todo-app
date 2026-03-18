@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -51,5 +52,11 @@ export class TasksController {
     @Body() data: UpdateTaskRequestDto,
   ): Promise<UpdateTaskResponseDto> {
     return this.tasksService.update(id, data);
+  }
+
+  @Delete(':id')
+  @UseGuards(OwnerShipGuard('task'))
+  async delete(@Param('id') id: string): Promise<void> {
+    await this.tasksService.delete(id);
   }
 }
