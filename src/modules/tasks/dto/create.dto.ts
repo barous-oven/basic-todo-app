@@ -1,10 +1,8 @@
+import { GetDetailTaskResponseDto } from './get-detail.dto';
 import { PickType } from '@nestjs/mapped-types';
-import { DetailTaskDto } from './detail.dto';
 
-export class CreateTaskRequestDto extends PickType(DetailTaskDto, [
+export class CreateTaskRequestDto extends PickType(GetDetailTaskResponseDto, [
   'title',
   'description',
   'expiredAt',
 ]) {}
-
-export class CreateTaskResponseDto extends PickType(DetailTaskDto, ['id']) {}

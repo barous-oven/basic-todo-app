@@ -5,7 +5,7 @@ import { UsersService } from '../users/users.service';
 import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
 import { PasswordUtils } from 'src/utils/password/password.util';
 import { TokenService } from '../token/token.service';
-import { EnvConfigService } from '../../config/envConfig.service';
+import { EnvConfigService } from '../../config/env-config.service';
 import { TokenType } from 'src/generated/prisma/enums';
 
 @Injectable()

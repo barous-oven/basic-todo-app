@@ -2,16 +2,17 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/libs/database/prisma.service';
 import { TaskStatus } from 'src/generated/prisma/enums';
 import { TUserPayload } from '../auth/auth.type';
-import { CreateTaskRequestDto, CreateTaskResponseDto } from './dto/create.dto';
+import { CreateTaskRequestDto } from './dto/create.dto';
 import {
   GetListTaskRequestDto,
   GetListTaskResponseDto,
 } from './dto/get-list.dto';
-import { PaginationResponse } from 'src/utils/pagination/response';
 import { plainToInstance } from 'class-transformer';
 import { Prisma } from 'src/generated/prisma/client';
-import { UpdateTaskRequestDto, UpdateTaskResponseDto } from './dto/update.dto';
-import { GetDetailTaskDto } from './dto/get-detail.dto';
+import { UpdateTaskRequestDto } from './dto/update.dto';
+import { GetDetailTaskResponseDto } from './dto/get-detail.dto';
+import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
+import { ResponseIdDto } from 'src/libs/dto/response-id.dto';
 
 @Injectable()
 export class TasksService {
@@ -20,7 +21,7 @@ export class TasksService {
   async create(
     data: CreateTaskRequestDto,
     user: TUserPayload,
-  ): Promise<CreateTaskResponseDto> {
+  ): Promise<ResponseIdDto> {
     const createdBy: string = user.userId;
 
     const task = await this.prisma.task.create({
@@ -31,7 +32,7 @@ export class TasksService {
       },
     });
 
-    const response = plainToInstance(CreateTaskResponseDto, task, {
+    const response = plainToInstance(ResponseIdDto, task, {
       excludeExtraneousValues: true,
     });
 
@@ -40,7 +41,7 @@ export class TasksService {
 
   async getList(
     query: GetListTaskRequestDto,
-  ): Promise<PaginationResponse<GetListTaskResponseDto>> {
+  ): Promise<PaginationResponseDto<GetListTaskResponseDto>> {
     const { limit, page, status, title, expiredAt } = query;
 
     const take = limit;
@@ -94,7 +95,7 @@ export class TasksService {
     };
   }
 
-  async getDetail(id: string): Promise<GetDetailTaskDto> {
+  async getDetail(id: string): Promise<GetDetailTaskResponseDto> {
     const task = await this.prisma.task.findUnique({
       where: { id, deletedAt: null },
     });
@@ -103,23 +104,20 @@ export class TasksService {
       throw new NotFoundException('Task not found!');
     }
 
-    const taskRes = plainToInstance(GetDetailTaskDto, task, {
+    const taskRes = plainToInstance(GetDetailTaskResponseDto, task, {
       excludeExtraneousValues: true,
     });
 
     return taskRes;
   }
 
-  async update(
-    id: string,
-    data: UpdateTaskRequestDto,
-  ): Promise<UpdateTaskResponseDto> {
+  async update(id: string, data: UpdateTaskRequestDto): Promise<ResponseIdDto> {
     const updatedData = await this.prisma.task.update({
       where: { id, deletedAt: null },
       data,
     });
 
-    const response = plainToInstance(UpdateTaskResponseDto, updatedData, {
+    const response = plainToInstance(ResponseIdDto, updatedData, {
       excludeExtraneousValues: true,
     });
 
