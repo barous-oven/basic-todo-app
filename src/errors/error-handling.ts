@@ -19,12 +19,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       httpException = exception;
-    } else if (
-      exception instanceof Prisma.PrismaClientKnownRequestError ||
-      exception instanceof Prisma.PrismaClientValidationError ||
-      exception instanceof Prisma.PrismaClientInitializationError ||
-      exception instanceof Prisma.PrismaClientRustPanicError
-    ) {
+    } else if (this.isPrismaException(exception)) {
       httpException = mapPrismaException(exception);
     } else {
       httpException = new HttpException(
@@ -51,5 +46,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message,
       error,
     });
+  }
+
+  private isPrismaException(
+    exception: unknown,
+  ): exception is
+    | Prisma.PrismaClientKnownRequestError
+    | Prisma.PrismaClientValidationError
+    | Prisma.PrismaClientInitializationError
+    | Prisma.PrismaClientRustPanicError {
+    return (
+      exception instanceof Prisma.PrismaClientKnownRequestError ||
+      exception instanceof Prisma.PrismaClientValidationError ||
+      exception instanceof Prisma.PrismaClientInitializationError ||
+      exception instanceof Prisma.PrismaClientRustPanicError
+    );
   }
 }
