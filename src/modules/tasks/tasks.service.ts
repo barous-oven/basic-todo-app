@@ -95,7 +95,9 @@ export class TasksService {
   }
 
   async getDetail(id: string): Promise<GetDetailTaskDto> {
-    const task = await this.prisma.task.findUnique({ where: { id } });
+    const task = await this.prisma.task.findUnique({
+      where: { id, deletedAt: null },
+    });
 
     if (!task) {
       throw new NotFoundException('Task not found!');
