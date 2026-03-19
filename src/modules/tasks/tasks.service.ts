@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/libs/database/prisma.service';
 import { TaskStatus } from 'src/generated/prisma/enums';
 import { TUserPayload } from '../auth/auth.type';
@@ -11,6 +11,7 @@ import { PaginationResponse } from 'src/utils/pagination/response';
 import { plainToInstance } from 'class-transformer';
 import { Prisma } from 'src/generated/prisma/client';
 import { UpdateTaskRequestDto, UpdateTaskResponseDto } from './dto/update.dto';
+import { GetDetailTaskDto } from './dto/get-detail.dto';
 
 @Injectable()
 export class TasksService {
@@ -91,6 +92,20 @@ export class TasksService {
         totalPages,
       },
     };
+  }
+
+  async getDetail(id: string): Promise<GetDetailTaskDto> {
+    const task = await this.prisma.task.findUnique({ where: { id } });
+
+    if (!task) {
+      throw new NotFoundException('Task not found!');
+    }
+
+    const taskRes = plainToInstance(GetDetailTaskDto, task, {
+      excludeExtraneousValues: true,
+    });
+
+    return taskRes;
   }
 
   async update(

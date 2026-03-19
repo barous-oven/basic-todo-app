@@ -21,6 +21,7 @@ import {
 } from './dto/get-list.dto';
 import { UpdateTaskRequestDto, UpdateTaskResponseDto } from './dto/update.dto';
 import { OwnerShipGuard } from 'src/guards/ownership.guard';
+import { GetDetailTaskDto } from './dto/get-detail.dto';
 
 @Controller({
   version: '1',
@@ -43,6 +44,12 @@ export class TasksController {
     @Query() query: GetListTaskRequestDto,
   ): Promise<PaginationResponse<GetListTaskResponseDto>> {
     return this.tasksService.getList(query);
+  }
+
+  @Get(':id')
+  @UseGuards(OwnerShipGuard('task'))
+  async getDetail(@Param('id') id: string): Promise<GetDetailTaskDto> {
+    return this.tasksService.getDetail(id);
   }
 
   @Put(':id')
