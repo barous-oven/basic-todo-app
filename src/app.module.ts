@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './libs/database/prisma.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { EnvConfigModule } from './config/envConfig.module';
+import { EnvConfigModule } from './config/env-config.module';
 import { JwtStrategy } from './guards/strategies/jwt.strategy';
 import { TasksModule } from './modules/tasks/tasks.module';
 

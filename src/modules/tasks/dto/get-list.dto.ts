@@ -1,10 +1,10 @@
+import { GetDetailTaskResponseDto } from './get-detail.dto';
 import { PickType } from '@nestjs/mapped-types';
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import { PaginationRequestDto } from 'src/libs/dto/pagination.dto';
 import { TaskStatus } from 'src/generated/prisma/enums';
-import { PaginationRequest } from 'src/utils/pagination/request';
-import { DetailTaskDto } from './detail.dto';
 
-export class GetListTaskRequestDto extends PaginationRequest {
+export class GetListTaskRequestDto extends PaginationRequestDto {
   @IsOptional()
   @IsString()
   title?: string;
@@ -18,7 +18,7 @@ export class GetListTaskRequestDto extends PaginationRequest {
   expiredAt?: string;
 }
 
-export class GetListTaskResponseDto extends PickType(DetailTaskDto, [
+export class GetListTaskResponseDto extends PickType(GetDetailTaskResponseDto, [
   'id',
   'title',
   'status',

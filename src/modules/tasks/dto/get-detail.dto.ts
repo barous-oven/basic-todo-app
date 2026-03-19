@@ -7,9 +7,9 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { TaskStatus } from 'src/generated/prisma/enums';
+import { TaskStatus } from 'src/generated/prisma';
 
-export class DetailTaskDto {
+export class GetDetailTaskResponseDto {
   @IsUUID()
   @Expose()
   id: string;
