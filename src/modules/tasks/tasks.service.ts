@@ -22,13 +22,13 @@ export class TasksService {
     data: CreateTaskRequestDto,
     user: TUserPayload,
   ): Promise<ResponseIdDto> {
-    const createdBy: string = user.userId;
+    const creatorId: string = user.userId;
 
     const task = await this.prisma.task.create({
       data: {
         ...data,
         status: TaskStatus.PENDING,
-        createdBy,
+        creatorId,
       },
     });
 
@@ -50,7 +50,7 @@ export class TasksService {
 
     const where: Prisma.TaskWhereInput = {
       deletedAt: null,
-      createdBy: user.userId,
+      creatorId: user.userId,
     };
 
     if (status) {
@@ -103,7 +103,7 @@ export class TasksService {
     user: TUserPayload,
   ): Promise<GetDetailTaskResponseDto> {
     const task = await this.prisma.task.findUnique({
-      where: { id, deletedAt: null, createdBy: user.userId },
+      where: { id, deletedAt: null, creatorId: user.userId },
     });
 
     if (!task) {
@@ -123,7 +123,7 @@ export class TasksService {
     user: TUserPayload,
   ): Promise<ResponseIdDto> {
     const updatedData = await this.prisma.task.update({
-      where: { id, deletedAt: null, createdBy: user.userId },
+      where: { id, deletedAt: null, creatorId: user.userId },
       data,
     });
 
@@ -136,7 +136,7 @@ export class TasksService {
 
   async delete(id: string, user: TUserPayload): Promise<void> {
     await this.prisma.task.update({
-      where: { id, createdBy: user.userId },
+      where: { id, creatorId: user.userId },
       data: {
         deletedAt: new Date(),
       },
