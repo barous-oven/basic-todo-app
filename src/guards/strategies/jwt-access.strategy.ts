@@ -1,9 +1,14 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
+import { TUserPayload } from 'src/modules/auth/auth.type';
+import { TokenType } from 'src/generated/prisma/enums';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class JwtAccessStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-access',
+) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -12,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  validate(payload: { userId: string; type: string }) {
+  validate(payload: { userId: string; type: TokenType }): TUserPayload {
     return {
       userId: payload.userId,
       type: payload.type,

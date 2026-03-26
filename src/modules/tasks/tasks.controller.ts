@@ -9,7 +9,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
 import { CurrentUser } from 'src/libs/decorator/current-user.decorator';
 import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
 import { ResponseIdDto } from 'src/libs/dto/response-id.dto';
@@ -22,12 +21,13 @@ import {
 } from './dto/get-list.dto';
 import { UpdateTaskRequestDto } from './dto/update.dto';
 import { TasksService } from './tasks.service';
+import { JwtAccessAuthGuard } from 'src/guards/auth-access.guard';
 
 @Controller({
   version: '1',
   path: 'tasks',
 })
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAccessAuthGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 

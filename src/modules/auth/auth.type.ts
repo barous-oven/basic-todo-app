@@ -4,3 +4,7 @@ export type TUserPayload = {
   userId: string;
   type: TokenType;
 };
+
+export type TUserRefreshPayload = TUserPayload & {
+  refreshToken: string;
+};
