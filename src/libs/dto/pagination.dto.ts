@@ -27,6 +27,9 @@ export class PaginationMetaDto {
 
   @IsNumber()
   totalPages: number;
+
+  @IsNumber()
+  currentPage: number;
 }
 
 export class PaginationResponseDto<T> {

@@ -6,8 +6,9 @@ import { PrismaModule } from './libs/database/prisma.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { EnvConfigModule } from './config/env-config.module';
-import { JwtStrategy } from './guards/strategies/jwt.strategy';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { JwtAccessStrategy } from './guards/strategies/jwt-access.strategy';
+import { JwtRefreshStrategy } from './guards/strategies/jwt-refresh.strategy';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { TasksModule } from './modules/tasks/tasks.module';
     TasksModule,
   ],
   controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],
 })
 export class AppModule {}

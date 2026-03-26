@@ -38,9 +38,9 @@ model Task {
   title       String
   description String?
   status      TaskStatus @default(PENDING)
-  user        User       @relation(fields: [createdBy], references: [id])
+  user        User       @relation(fields: [creatorId], references: [id])
   expiredAt   DateTime   @map("expired_at")
-  createdBy   String     @map("created_by")
+  creatorId   String     @map("creator_id")
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
   deletedAt   DateTime?  @map("deleted_at")

@@ -22,13 +22,13 @@ export class TasksService {
     data: CreateTaskRequestDto,
     user: TUserPayload,
   ): Promise<ResponseIdDto> {
-    const createdBy: string = user.userId;
+    const creatorId: string = user.userId;
 
     const task = await this.prisma.task.create({
       data: {
         ...data,
         status: TaskStatus.PENDING,
-        createdBy,
+        creatorId,
       },
     });
 
@@ -41,6 +41,7 @@ export class TasksService {
 
   async getList(
     query: GetListTaskRequestDto,
+    user: TUserPayload,
   ): Promise<PaginationResponseDto<GetListTaskResponseDto>> {
     const { limit, page, status, title, expiredAt } = query;
 
@@ -49,6 +50,7 @@ export class TasksService {
 
     const where: Prisma.TaskWhereInput = {
       deletedAt: null,
+      creatorId: user.userId,
     };
 
     if (status) {
@@ -91,13 +93,17 @@ export class TasksService {
       meta: {
         total,
         totalPages,
+        currentPage: page,
       },
     };
   }
 
-  async getDetail(id: string): Promise<GetDetailTaskResponseDto> {
+  async getDetail(
+    id: string,
+    user: TUserPayload,
+  ): Promise<GetDetailTaskResponseDto> {
     const task = await this.prisma.task.findUnique({
-      where: { id, deletedAt: null },
+      where: { id, deletedAt: null, creatorId: user.userId },
     });
 
     if (!task) {
@@ -111,9 +117,13 @@ export class TasksService {
     return taskRes;
   }
 
-  async update(id: string, data: UpdateTaskRequestDto): Promise<ResponseIdDto> {
+  async update(
+    id: string,
+    data: UpdateTaskRequestDto,
+    user: TUserPayload,
+  ): Promise<ResponseIdDto> {
     const updatedData = await this.prisma.task.update({
-      where: { id, deletedAt: null },
+      where: { id, deletedAt: null, creatorId: user.userId },
       data,
     });
 
@@ -124,9 +134,9 @@ export class TasksService {
     return response;
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, user: TUserPayload): Promise<void> {
     await this.prisma.task.update({
-      where: { id },
+      where: { id, creatorId: user.userId },
       data: {
         deletedAt: new Date(),
       },

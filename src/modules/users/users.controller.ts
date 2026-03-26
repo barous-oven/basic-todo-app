@@ -7,13 +7,13 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserResponseDto } from './dto/user.dto';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
+import { JwtAccessAuthGuard } from 'src/guards/auth-access.guard';
 
 @Controller({
   version: '1',
   path: 'users',
 })
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAccessAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
