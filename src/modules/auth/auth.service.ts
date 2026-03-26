@@ -64,6 +64,7 @@ export class AuthService {
     const accessToken = await this.tokenService.generateToken(
       payload,
       this.envConfigService.jwt.access,
+      TokenType.ACCESS,
     );
     const refreshToken = await this.tokenService.generateToken(
       payload,
@@ -120,6 +121,7 @@ export class AuthService {
     const accessToken = await this.tokenService.generateToken(
       { id: currentRefreshToken.userId },
       this.envConfigService.jwt.access,
+      TokenType.ACCESS,
     );
     const refreshToken = await this.tokenService.generateToken(
       { id: currentRefreshToken.userId },

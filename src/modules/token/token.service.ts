@@ -18,7 +18,7 @@ export class TokenService {
   public async generateToken(
     payload: { id: string },
     jwtConfig: { secret: string; expiresIn: StringValue },
-    type: TokenType = TokenType.ACCESS,
+    type: TokenType,
   ) {
     await this.prisma.token.deleteMany({
       where: {
