@@ -21,7 +21,7 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaExceptionsFilter());
   app.enableCors();
 
-  await app.listen(configService.get<number>('PORT', 3000));
+  await app.listen(configService.get<number>('PORT', 3000), '0.0.0.0');
 
   console.log(`Application is running on: ${await app.getUrl()}`);
 }

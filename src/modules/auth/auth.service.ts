@@ -45,7 +45,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new ConflictException(`Invalid email or password`);
+      throw new UnauthorizedException(`Invalid email or password`);
     }
 
     const isValid = await PasswordUtils.verifyPassword(
@@ -54,7 +54,7 @@ export class AuthService {
     );
 
     if (!isValid) {
-      throw new ConflictException(`Invalid email or password`);
+      throw new UnauthorizedException(`Invalid email or password`);
     }
 
     const payload = {
