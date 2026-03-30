@@ -89,9 +89,6 @@ export class TasksController {
   async getTaskWithAI(
     @Body() body: GetAIGeneratedTaskRequestDto,
   ): Promise<GetAIGeneratedTaskResponseDto[]> {
-    if (!body || !body.requirement) {
-      throw new BadRequestException('Requirement is required!');
-    }
     return this.tasksService.getTaskWithAI(body.requirement);
   }
 }
