@@ -14,12 +14,12 @@ import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
 import { ResponseIdDto } from 'src/libs/dto/response-id.dto';
 import { TUserPayload } from '../auth/auth.type';
 import { CreateTaskRequestDto } from './dto/create.dto';
+import { GetAIGeneratedTaskResponseDto } from './dto/get-ai-generated-task.dto';
 import { GetDetailTaskResponseDto } from './dto/get-detail.dto';
 import {
   GetListTaskRequestDto,
   GetListTaskResponseDto,
 } from './dto/get-list.dto';
-import { GetLLMTaskResponseDto } from './dto/get-llm-task.dto';
 import { UpdateTaskRequestDto } from './dto/update.dto';
 
 @Injectable()
@@ -166,7 +166,9 @@ export class TasksService {
     });
   }
 
-  async getTaskWithAI(requirement: string): Promise<GetLLMTaskResponseDto[]> {
+  async getTaskWithAI(
+    requirement: string,
+  ): Promise<GetAIGeneratedTaskResponseDto[]> {
     const ai = new GoogleGenAI({});
     const contents = getPromt(requirement);
     const response = await ai.models.generateContent({
@@ -179,7 +181,7 @@ export class TasksService {
     }
     try {
       const cleanedJson = responseText.replace(/^```json|```$/g, '');
-      const tasks: GetLLMTaskResponseDto[] = JSON.parse(cleanedJson);
+      const tasks: GetAIGeneratedTaskResponseDto[] = JSON.parse(cleanedJson);
       return tasks;
     } catch (error) {
       throw new BadRequestException(error);

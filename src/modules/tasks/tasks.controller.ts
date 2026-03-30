@@ -23,7 +23,10 @@ import {
 import { UpdateTaskRequestDto } from './dto/update.dto';
 import { TasksService } from './tasks.service';
 import { JwtAccessAuthGuard } from 'src/guards/auth-access.guard';
-import { GetLLMTaskResponseDto } from './dto/get-llm-task.dto';
+import {
+  GetAIGeneratedTaskRequestDto,
+  GetAIGeneratedTaskResponseDto,
+} from './dto/get-ai-generated-task.dto';
 
 @Controller({
   version: '1',
@@ -81,22 +84,14 @@ export class TasksController {
   ): Promise<void> {
     await this.tasksService.delete(id, user);
   }
-}
 
-@Controller({
-  version: '1',
-  path: 'llm',
-})
-@UseGuards(JwtAccessAuthGuard)
-export class LLMTaskController {
-  constructor(private readonly tasksService: TasksService) {}
-  @Get('tasks')
+  @Post('ai-generation')
   async getTaskWithAI(
-    @Query('requirement') requirement: string,
-  ): Promise<GetLLMTaskResponseDto[]> {
-    if (!requirement) {
+    @Body() body: GetAIGeneratedTaskRequestDto,
+  ): Promise<GetAIGeneratedTaskResponseDto[]> {
+    if (!body || !body.requirement) {
       throw new BadRequestException('Requirement is required!');
     }
-    return this.tasksService.getTaskWithAI(requirement);
+    return this.tasksService.getTaskWithAI(body.requirement);
   }
 }

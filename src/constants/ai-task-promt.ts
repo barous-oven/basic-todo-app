@@ -46,6 +46,7 @@ Current Date:
 7. **Output Rules**
    - Return ONLY a JSON array.
    - Do NOT include markdown, explanations, or extra text.
+   - Return max 10 tasks for each requirement
 
 ### Output Format:
 [
