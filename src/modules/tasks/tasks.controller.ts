@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -22,6 +23,7 @@ import {
 import { UpdateTaskRequestDto } from './dto/update.dto';
 import { TasksService } from './tasks.service';
 import { JwtAccessAuthGuard } from 'src/guards/auth-access.guard';
+import { GetLLMTaskResponseDto } from './dto/get-llm-task.dto';
 
 @Controller({
   version: '1',
@@ -37,6 +39,14 @@ export class TasksController {
     @CurrentUser() user: TUserPayload,
   ): Promise<ResponseIdDto> {
     return await this.tasksService.create(data, user);
+  }
+
+  @Post('many')
+  async createMany(
+    @Body() data: CreateTaskRequestDto[],
+    @CurrentUser() user: TUserPayload,
+  ): Promise<void> {
+    return this.tasksService.createMany(data, user);
   }
 
   @Get()
@@ -70,5 +80,23 @@ export class TasksController {
     @CurrentUser() user: TUserPayload,
   ): Promise<void> {
     await this.tasksService.delete(id, user);
+  }
+}
+
+@Controller({
+  version: '1',
+  path: 'llm',
+})
+@UseGuards(JwtAccessAuthGuard)
+export class LLMTaskController {
+  constructor(private readonly tasksService: TasksService) {}
+  @Get('tasks')
+  async getTaskWithAI(
+    @Query('requirement') requirement: string,
+  ): Promise<GetLLMTaskResponseDto[]> {
+    if (!requirement) {
+      throw new BadRequestException('Requirement is required!');
+    }
+    return this.tasksService.getTaskWithAI(requirement);
   }
 }
