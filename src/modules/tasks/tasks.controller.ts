@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,11 +9,16 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { JwtAccessAuthGuard } from 'src/guards/auth-access.guard';
 import { CurrentUser } from 'src/libs/decorator/current-user.decorator';
 import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
 import { ResponseIdDto } from 'src/libs/dto/response-id.dto';
 import type { TUserPayload } from '../auth/auth.type';
 import { CreateTaskRequestDto } from './dto/create.dto';
+import {
+  GetAIGeneratedTaskRequestDto,
+  GetAIGeneratedTaskResponseDto,
+} from './dto/get-ai-generated-task.dto';
 import { GetDetailTaskResponseDto } from './dto/get-detail.dto';
 import {
   GetListTaskRequestDto,
@@ -22,11 +26,6 @@ import {
 } from './dto/get-list.dto';
 import { UpdateTaskRequestDto } from './dto/update.dto';
 import { TasksService } from './tasks.service';
-import { JwtAccessAuthGuard } from 'src/guards/auth-access.guard';
-import {
-  GetAIGeneratedTaskRequestDto,
-  GetAIGeneratedTaskResponseDto,
-} from './dto/get-ai-generated-task.dto';
 
 @Controller({
   version: '1',
