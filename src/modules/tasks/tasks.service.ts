@@ -1,18 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/libs/database/prisma.service';
+import { GoogleGenAI } from '@google/genai';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { getPromt } from 'src/constants/ai-task-promt';
+import { Prisma } from 'src/generated/prisma/client';
 import { TaskStatus } from 'src/generated/prisma/enums';
+import { PrismaService } from 'src/libs/database/prisma.service';
+import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
+import { ResponseIdDto } from 'src/libs/dto/response-id.dto';
 import { TUserPayload } from '../auth/auth.type';
 import { CreateTaskRequestDto } from './dto/create.dto';
+import { GetAIGeneratedTaskResponseDto } from './dto/get-ai-generated-task.dto';
+import { GetDetailTaskResponseDto } from './dto/get-detail.dto';
 import {
   GetListTaskRequestDto,
   GetListTaskResponseDto,
 } from './dto/get-list.dto';
-import { plainToInstance } from 'class-transformer';
-import { Prisma } from 'src/generated/prisma/client';
 import { UpdateTaskRequestDto } from './dto/update.dto';
-import { GetDetailTaskResponseDto } from './dto/get-detail.dto';
-import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
-import { ResponseIdDto } from 'src/libs/dto/response-id.dto';
 
 @Injectable()
 export class TasksService {
@@ -37,6 +45,21 @@ export class TasksService {
     });
 
     return response;
+  }
+
+  async createMany(
+    data: CreateTaskRequestDto[],
+    user: TUserPayload,
+  ): Promise<void> {
+    const creatorId = user.userId;
+
+    const tasks = data.map((task) => ({
+      ...task,
+      creatorId,
+      status: TaskStatus.PENDING,
+    }));
+
+    await this.prisma.task.createMany({ data: tasks });
   }
 
   async getList(
@@ -141,5 +164,27 @@ export class TasksService {
         deletedAt: new Date(),
       },
     });
+  }
+
+  async getTaskWithAI(
+    requirement: string,
+  ): Promise<GetAIGeneratedTaskResponseDto[]> {
+    const ai = new GoogleGenAI({});
+    const contents = getPromt(requirement);
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-lite',
+      contents,
+    });
+    const responseText = response.text;
+    if (!responseText) {
+      throw new InternalServerErrorException();
+    }
+    try {
+      const cleanedJson = responseText.replace(/^```json|```$/g, '');
+      const tasks: GetAIGeneratedTaskResponseDto[] = JSON.parse(cleanedJson);
+      return tasks;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

@@ -9,11 +9,16 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { JwtAccessAuthGuard } from 'src/guards/auth-access.guard';
 import { CurrentUser } from 'src/libs/decorator/current-user.decorator';
 import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
 import { ResponseIdDto } from 'src/libs/dto/response-id.dto';
 import type { TUserPayload } from '../auth/auth.type';
 import { CreateTaskRequestDto } from './dto/create.dto';
+import {
+  GetAIGeneratedTaskRequestDto,
+  GetAIGeneratedTaskResponseDto,
+} from './dto/get-ai-generated-task.dto';
 import { GetDetailTaskResponseDto } from './dto/get-detail.dto';
 import {
   GetListTaskRequestDto,
@@ -21,7 +26,6 @@ import {
 } from './dto/get-list.dto';
 import { UpdateTaskRequestDto } from './dto/update.dto';
 import { TasksService } from './tasks.service';
-import { JwtAccessAuthGuard } from 'src/guards/auth-access.guard';
 
 @Controller({
   version: '1',
@@ -37,6 +41,14 @@ export class TasksController {
     @CurrentUser() user: TUserPayload,
   ): Promise<ResponseIdDto> {
     return await this.tasksService.create(data, user);
+  }
+
+  @Post('many')
+  async createMany(
+    @Body() data: CreateTaskRequestDto[],
+    @CurrentUser() user: TUserPayload,
+  ): Promise<void> {
+    return this.tasksService.createMany(data, user);
   }
 
   @Get()
@@ -70,5 +82,12 @@ export class TasksController {
     @CurrentUser() user: TUserPayload,
   ): Promise<void> {
     await this.tasksService.delete(id, user);
+  }
+
+  @Post('ai-generation')
+  async getTaskWithAI(
+    @Body() body: GetAIGeneratedTaskRequestDto,
+  ): Promise<GetAIGeneratedTaskResponseDto[]> {
+    return this.tasksService.getTaskWithAI(body.requirement);
   }
 }
