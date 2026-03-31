@@ -9,6 +9,7 @@ import { EnvConfigModule } from './config/env-config.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { JwtAccessStrategy } from './guards/strategies/jwt-access.strategy';
 import { JwtRefreshStrategy } from './guards/strategies/jwt-refresh.strategy';
+import { TagsModule } from './modules/tags/tags.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtRefreshStrategy } from './guards/strategies/jwt-refresh.strategy';
     AuthModule,
     EnvConfigModule,
     TasksModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],

@@ -33,6 +33,18 @@ enum TaskStatus {
   COMPLETED
 }
 
+model Tag {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime?
+  taskTags    TaskTag[]
+
+  @@map("tags")
+}
+
 model Task {
   id          String     @id @default(uuid())
   title       String
@@ -44,8 +56,21 @@ model Task {
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
   deletedAt   DateTime?  @map("deleted_at")
+  taskTags    TaskTag[]
 
   @@map("tasks")
+}
+
+model TaskTag {
+  id String @id @default(uuid())
+
+  tag   Tag    @relation(fields: [tagId], references: [id])
+  tagId String
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String
+
+  @@map("task_tag")
 }
 
 enum TokenType {
