@@ -5,4 +5,10 @@ export class CreateTaskRequestDto extends PickType(GetDetailTaskResponseDto, [
   'title',
   'description',
   'expiredAt',
+  'tagIds',
 ]) {}
+
+export class CreateManyTaskRequestDto extends PickType(
+  GetDetailTaskResponseDto,
+  ['title', 'description', 'expiredAt'],
+) {}

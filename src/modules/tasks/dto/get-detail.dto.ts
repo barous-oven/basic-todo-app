@@ -1,5 +1,6 @@
 import { Expose, Transform } from 'class-transformer';
 import {
+  IsArray,
   IsDate,
   IsEnum,
   IsNotEmpty,
@@ -27,6 +28,11 @@ export class GetDetailTaskResponseDto {
   @IsEnum(TaskStatus)
   @Expose()
   status: TaskStatus;
+
+  @IsArray()
+  @IsUUID('4', { each: true })
+  @IsOptional()
+  tagIds: string[];
 
   @IsUUID()
   @Expose()

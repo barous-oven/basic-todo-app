@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { Prisma, PrismaClient } from 'src/generated/prisma/client';
+import { Prisma } from 'src/generated/prisma/client';
+import { PrismaService } from 'src/libs/database/prisma.service';
 import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
 import { ResponseIdDto } from '../../libs/dto/response-id.dto';
 import { CreateTagRequestDto } from './dto/create-tag.dto';
@@ -9,7 +10,7 @@ import { UpdateTagRequestDto } from './dto/update-tag.dto';
 
 @Injectable()
 export class TagsService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaService) {}
   async create(data: CreateTagRequestDto): Promise<ResponseIdDto> {
     const tag = await this.prisma.tag.create({ data });
 
@@ -73,6 +74,24 @@ export class TagsService {
     }
 
     return plainToInstance(GetTagResponseDto, tag, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async findManyByIds(ids: string[]): Promise<GetTagResponseDto[]> {
+    const tags = await this.prisma.tag.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    if (!tags) {
+      throw new NotFoundException('Task not found!');
+    }
+
+    return plainToInstance(GetTagResponseDto, tags, {
       excludeExtraneousValues: true,
     });
   }
