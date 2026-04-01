@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { Prisma } from 'src/generated/prisma/client';
 import { PrismaService } from 'src/libs/database/prisma.service';
@@ -12,6 +16,15 @@ import { UpdateTagRequestDto } from './dto/update-tag.dto';
 export class TagsService {
   constructor(private readonly prisma: PrismaService) {}
   async create(data: CreateTagRequestDto): Promise<ResponseIdDto> {
+    const existedTag = await this.prisma.tag.findFirst({
+      where: {
+        title: data.title,
+        deletedAt: null,
+      },
+    });
+
+    if (existedTag) throw new ConflictException('Tag is existed!');
+
     const tag = await this.prisma.tag.create({ data });
 
     return { id: tag.id };

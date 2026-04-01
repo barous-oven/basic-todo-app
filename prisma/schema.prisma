@@ -37,7 +37,7 @@ enum TaskStatus {
 
 model Tag {
   id          String @id @default(uuid())
-  title       String @unique
+  title       String
   description String
 
   createdAt DateTime  @default(now()) @map("created_at")

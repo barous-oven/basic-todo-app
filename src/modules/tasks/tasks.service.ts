@@ -113,13 +113,16 @@ export class TasksService {
         where,
         skip,
         take,
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         include: {
           taskTags: {
             include: {
               tag: true,
+            },
+            where: {
+              tag: {
+                deletedAt: null,
+              },
             },
           },
         },
