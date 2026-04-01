@@ -13,7 +13,10 @@ import { PrismaService } from 'src/libs/database/prisma.service';
 import { PaginationResponseDto } from 'src/libs/dto/pagination.dto';
 import { ResponseIdDto } from 'src/libs/dto/response-id.dto';
 import { TUserPayload } from '../auth/auth.type';
-import { CreateTaskRequestDto } from './dto/create.dto';
+import {
+  CreateManyTaskRequestDto,
+  CreateTaskRequestDto,
+} from './dto/create.dto';
 import { GetAIGeneratedTaskResponseDto } from './dto/get-ai-generated-task.dto';
 import { GetDetailTaskResponseDto } from './dto/get-detail.dto';
 import {
@@ -21,6 +24,7 @@ import {
   GetListTaskResponseDto,
 } from './dto/get-list.dto';
 import { UpdateTaskRequestDto } from './dto/update.dto';
+import { TaskTagModel } from 'src/generated/prisma/models';
 
 @Injectable()
 export class TasksService {
@@ -32,13 +36,17 @@ export class TasksService {
   ): Promise<ResponseIdDto> {
     const creatorId: string = user.userId;
 
+    const { tagIds, ...rest } = data;
+
     const task = await this.prisma.task.create({
       data: {
-        ...data,
+        ...rest,
         status: TaskStatus.PENDING,
         creatorId,
       },
     });
+
+    await this.createTaskTags(task.id, tagIds);
 
     const response = plainToInstance(ResponseIdDto, task, {
       excludeExtraneousValues: true,
@@ -48,7 +56,7 @@ export class TasksService {
   }
 
   async createMany(
-    data: CreateTaskRequestDto[],
+    data: CreateManyTaskRequestDto[],
     user: TUserPayload,
   ): Promise<void> {
     const creatorId = user.userId;
@@ -66,7 +74,7 @@ export class TasksService {
     query: GetListTaskRequestDto,
     user: TUserPayload,
   ): Promise<PaginationResponseDto<GetListTaskResponseDto>> {
-    const { limit, page, status, title, expiredAt } = query;
+    const { limit, page, status, title, expiredAt, tagId } = query;
 
     const take = limit;
     const skip = (page - 1) * take;
@@ -93,13 +101,30 @@ export class TasksService {
       };
     }
 
+    if (tagId) {
+      const taskIds = await this.getTaskIdsByTagId(tagId);
+
+      where.id = {
+        in: taskIds,
+      };
+    }
     const [tasks, total] = await Promise.all([
       this.prisma.task.findMany({
         where,
         skip,
         take,
-        orderBy: {
-          createdAt: 'desc',
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        include: {
+          taskTags: {
+            include: {
+              tag: true,
+            },
+            where: {
+              tag: {
+                deletedAt: null,
+              },
+            },
+          },
         },
       }),
       this.prisma.task.count({ where }),
@@ -107,8 +132,18 @@ export class TasksService {
 
     const totalPages = Math.ceil(total / take);
 
-    const taskResult = plainToInstance(GetListTaskResponseDto, tasks, {
+    const taskResponse = tasks.map((task) => {
+      const { taskTags, ...base } = task;
+
+      return {
+        ...base,
+        tags: taskTags.map((taskTag) => taskTag.tag),
+      };
+    });
+
+    const taskResult = plainToInstance(GetListTaskResponseDto, taskResponse, {
       excludeExtraneousValues: true,
+      enableImplicitConversion: true,
     });
 
     return {
@@ -133,11 +168,16 @@ export class TasksService {
       throw new NotFoundException('Task not found!');
     }
 
+    const tagIds = await this.getTagIdsByTaskId(id);
+
     const taskRes = plainToInstance(GetDetailTaskResponseDto, task, {
       excludeExtraneousValues: true,
     });
 
-    return taskRes;
+    return {
+      ...taskRes,
+      tagIds,
+    };
   }
 
   async update(
@@ -145,10 +185,14 @@ export class TasksService {
     data: UpdateTaskRequestDto,
     user: TUserPayload,
   ): Promise<ResponseIdDto> {
+    const { tagIds, ...rest } = data;
+
     const updatedData = await this.prisma.task.update({
       where: { id, deletedAt: null, creatorId: user.userId },
-      data,
+      data: rest,
     });
+
+    if (tagIds) await this.updateTagIdsByTaskId(updatedData.id, tagIds);
 
     const response = plainToInstance(ResponseIdDto, updatedData, {
       excludeExtraneousValues: true,
@@ -186,5 +230,50 @@ export class TasksService {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+
+  private async createTaskTags(taskId: string, tagIds?: string[]) {
+    if (tagIds && tagIds.length > 0) {
+      const data = tagIds.map((tagId: string): Omit<TaskTagModel, 'id'> => {
+        return {
+          taskId,
+          tagId,
+        };
+      });
+
+      await this.prisma.taskTag.createMany({ data });
+    }
+  }
+
+  private async getTagIdsByTaskId(taskId: string): Promise<string[]> {
+    const taskTags = await this.prisma.taskTag.findMany({
+      where: {
+        taskId,
+      },
+    });
+
+    const tagIds = taskTags.map((taskTag) => taskTag.tagId);
+    return tagIds;
+  }
+
+  private async getTaskIdsByTagId(tagId: string): Promise<string[]> {
+    const taskTags = await this.prisma.taskTag.findMany({
+      where: {
+        tagId,
+      },
+    });
+
+    const taskIds = taskTags.map((taskTag) => taskTag.taskId);
+    return taskIds;
+  }
+
+  private async updateTagIdsByTaskId(taskId: string, tagIds: string[]) {
+    await this.prisma.taskTag.deleteMany({
+      where: {
+        taskId,
+      },
+    });
+
+    await this.createTaskTags(taskId, tagIds);
   }
 }

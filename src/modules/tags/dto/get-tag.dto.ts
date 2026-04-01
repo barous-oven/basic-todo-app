@@ -1,17 +1,16 @@
 import { Expose, Transform } from 'class-transformer';
 import {
-  IsArray,
   IsDate,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
-import { TaskStatus } from 'src/generated/prisma/enums';
+import { PaginationRequestDto } from 'src/libs/dto/pagination.dto';
 
-export class GetDetailTaskResponseDto {
+export class GetTagResponseDto {
   @IsUUID()
+  @IsString()
   @Expose()
   id: string;
 
@@ -23,25 +22,7 @@ export class GetDetailTaskResponseDto {
   @IsString()
   @IsOptional()
   @Expose()
-  description?: string | null;
-
-  @IsEnum(TaskStatus)
-  @Expose()
-  status: TaskStatus;
-
-  @IsArray()
-  @IsUUID('4', { each: true })
-  @IsOptional()
-  tagIds?: string[];
-
-  @IsUUID()
-  @Expose()
-  createdBy: string;
-
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
-  @Expose()
-  expiredAt: Date;
+  description: string;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
@@ -52,4 +33,10 @@ export class GetDetailTaskResponseDto {
   @Transform(({ value }) => new Date(value))
   @Expose()
   updatedAt: Date;
+}
+
+export class GetListTagRequestDto extends PaginationRequestDto {
+  @IsOptional()
+  @IsString()
+  title?: string;
 }
