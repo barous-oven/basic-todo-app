@@ -32,7 +32,7 @@ export class GetDetailTaskResponseDto {
   @IsArray()
   @IsUUID('4', { each: true })
   @IsOptional()
-  tagIds: string[];
+  tagIds?: string[];
 
   @IsUUID()
   @Expose()

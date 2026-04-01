@@ -24,7 +24,7 @@ export class GetListTaskRequestDto extends PaginationRequestDto {
   @IsString()
   @IsUUID()
   @IsOptional()
-  tag?: string;
+  tagId?: string;
 
   @IsOptional()
   @IsDateString()

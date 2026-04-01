@@ -78,24 +78,6 @@ export class TagsService {
     });
   }
 
-  async findManyByIds(ids: string[]): Promise<GetTagResponseDto[]> {
-    const tags = await this.prisma.tag.findMany({
-      where: {
-        id: {
-          in: ids,
-        },
-      },
-    });
-
-    if (!tags) {
-      throw new NotFoundException('Task not found!');
-    }
-
-    return plainToInstance(GetTagResponseDto, tags, {
-      excludeExtraneousValues: true,
-    });
-  }
-
   async update(id: string, data: UpdateTagRequestDto): Promise<ResponseIdDto> {
     const updatedTag = await this.prisma.tag.update({
       where: { id, deletedAt: null },

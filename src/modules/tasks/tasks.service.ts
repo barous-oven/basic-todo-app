@@ -46,7 +46,7 @@ export class TasksService {
       },
     });
 
-    await this.createTaskTag(task.id, tagIds);
+    await this.createTaskTags(task.id, tagIds);
 
     const response = plainToInstance(ResponseIdDto, task, {
       excludeExtraneousValues: true,
@@ -74,7 +74,7 @@ export class TasksService {
     query: GetListTaskRequestDto,
     user: TUserPayload,
   ): Promise<PaginationResponseDto<GetListTaskResponseDto>> {
-    const { limit, page, status, title, expiredAt, tag } = query;
+    const { limit, page, status, title, expiredAt, tagId } = query;
 
     const take = limit;
     const skip = (page - 1) * take;
@@ -101,8 +101,8 @@ export class TasksService {
       };
     }
 
-    if (tag) {
-      const taskIds = await this.getTaskForTag(tag);
+    if (tagId) {
+      const taskIds = await this.getTaskIdsByTagId(tagId);
 
       where.id = {
         in: taskIds,
@@ -165,7 +165,7 @@ export class TasksService {
       throw new NotFoundException('Task not found!');
     }
 
-    const tagIds = await this.getTagForTask(id);
+    const tagIds = await this.getTagIdsByTaskId(id);
 
     const taskRes = plainToInstance(GetDetailTaskResponseDto, task, {
       excludeExtraneousValues: true,
@@ -189,7 +189,7 @@ export class TasksService {
       data: rest,
     });
 
-    if (tagIds) await this.updateTagForTask(updatedData.id, tagIds);
+    if (tagIds) await this.updateTagIdsByTaskId(updatedData.id, tagIds);
 
     const response = plainToInstance(ResponseIdDto, updatedData, {
       excludeExtraneousValues: true,
@@ -229,8 +229,8 @@ export class TasksService {
     }
   }
 
-  private async createTaskTag(taskId: string, tagIds: string[]) {
-    if (tagIds.length > 0) {
+  private async createTaskTags(taskId: string, tagIds?: string[]) {
+    if (tagIds && tagIds.length > 0) {
       const data = tagIds.map((tagId: string): Omit<TaskTagModel, 'id'> => {
         return {
           taskId,
@@ -242,7 +242,7 @@ export class TasksService {
     }
   }
 
-  private async getTagForTask(taskId: string): Promise<string[]> {
+  private async getTagIdsByTaskId(taskId: string): Promise<string[]> {
     const taskTags = await this.prisma.taskTag.findMany({
       where: {
         taskId,
@@ -253,7 +253,7 @@ export class TasksService {
     return tagIds;
   }
 
-  private async getTaskForTag(tagId: string): Promise<string[]> {
+  private async getTaskIdsByTagId(tagId: string): Promise<string[]> {
     const taskTags = await this.prisma.taskTag.findMany({
       where: {
         tagId,
@@ -264,13 +264,13 @@ export class TasksService {
     return taskIds;
   }
 
-  private async updateTagForTask(taskId: string, tagIds: string[]) {
+  private async updateTagIdsByTaskId(taskId: string, tagIds: string[]) {
     await this.prisma.taskTag.deleteMany({
       where: {
         taskId,
       },
     });
 
-    await this.createTaskTag(taskId, tagIds);
+    await this.createTaskTags(taskId, tagIds);
   }
 }
