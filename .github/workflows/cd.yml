@@ -10,11 +10,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: TODO
-
-    defaults:
-      run:
-        working-directory: ./src
+    # environment: prod
 
     steps:
       - name: Checkout source code
@@ -24,10 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Debug secrets
-        run: |
-          echo "USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v4
