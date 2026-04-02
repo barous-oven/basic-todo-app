@@ -44,6 +44,8 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ${{ secrets.SERVER_PROJECT_PATH }}
-            docker-compose pull todo_be
+            docker-compose down
+            docker system prune -a
+            docker-compose pull
             docker-compose up -d
             docker image prune -af
