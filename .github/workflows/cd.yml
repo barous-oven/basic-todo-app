@@ -45,5 +45,5 @@ jobs:
           script: |
             cd ${{ secrets.SERVER_PROJECT_PATH }}
             docker-compose pull todo_be
-            docker-compose up -d todo_be
+            docker-compose up -d
             docker image prune -af
