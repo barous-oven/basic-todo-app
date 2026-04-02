@@ -3,7 +3,7 @@ import { OmitType } from '@nestjs/mapped-types';
 
 export class UpdateTaskRequestDto extends OmitType(GetDetailTaskResponseDto, [
   'id',
-  'createdBy',
+  'creatorId',
   'createdAt',
   'updatedAt',
 ]) {}

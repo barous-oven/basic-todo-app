@@ -30,7 +30,7 @@ export class GetDetailTaskResponseDto {
 
   @IsUUID()
   @Expose()
-  createdBy: string;
+  creatorId: string;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))

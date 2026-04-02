@@ -1,0 +1,64 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'prisma/**'
+      - 'test/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - 'tsconfig.json'
+      - 'tsconfig.build.json'
+      - 'nest-cli.json'
+      - '.github/workflows/ci.yml'
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'src/**'
+      - 'prisma/**'
+      - 'test/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - 'tsconfig.json'
+      - 'tsconfig.build.json'
+      - 'nest-cli.json'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./src
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: ./src/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: yarn prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/dummy
+
+      - name: Run lint
+        run: yarn lint
+
+      - name: Run unit test
+        run: yarn test
+
+      - name: Build project
+        run: yarn build
